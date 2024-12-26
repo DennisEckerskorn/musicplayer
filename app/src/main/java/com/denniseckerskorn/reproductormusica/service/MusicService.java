@@ -2,10 +2,15 @@ package com.denniseckerskorn.reproductormusica.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.IBinder;
 
 public class MusicService extends Service {
+    private MediaPlayer player;
+    private boolean isPaused = false;
+
     public MusicService() {
+
     }
 
     @Override
