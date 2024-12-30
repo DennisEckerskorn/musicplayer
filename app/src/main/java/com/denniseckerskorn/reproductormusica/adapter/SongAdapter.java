@@ -65,16 +65,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         public void bindSong(Song song) {
             tvSongTitleItem.setText(song.getTitle());
             tvSongArtistItem.setText(song.getArtist());
-            tvSongDurationItem.setText(formatDuration(song.getDuration()));
+            tvSongDurationItem.setText(song.getDuration());
             tvSongAlbumItem.setText(song.getAlbum());
-            //ivSongImageItem.setImageResource(song.getImage());
-        }
-
-        private String formatDuration(long durationMillis) {
-            long seconds = durationMillis / 1000;
-            long minutes = seconds / 60;
-            long remainingSeconds = seconds % 60;
-            return String.format("%02d:%02d", minutes, remainingSeconds);
+            ivSongImageItem.setImageBitmap(song.getCoverImage());
         }
 
         @Override

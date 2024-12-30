@@ -1,18 +1,25 @@
 package com.denniseckerskorn.reproductormusica.models;
 
+import android.graphics.Bitmap;
+import android.media.Image;
+
 import java.util.Objects;
 
 public class Song {
     private final String title;
     private final String artist;
-    private final long duration;
+    private final String duration;
     private final String album;
+    private final Bitmap coverImage;
+    private final int resourceId;
 
-    public Song(String title, String artist, long duration, String album) {
+    public Song(String title, String artist, String duration, String album, Bitmap coverImage, int resourceId) {
         this.title = title;
         this.artist = artist;
         this.duration = duration;
         this.album = album;
+        this.resourceId = resourceId;
+        this.coverImage = coverImage;
     }
 
     public String getTitle() {
@@ -23,12 +30,20 @@ public class Song {
         return artist;
     }
 
-    public long getDuration() {
+    public String getDuration() {
         return duration;
     }
 
     public String getAlbum() {
         return album;
+    }
+
+    public int getResourceId() {
+        return resourceId;
+    }
+
+    public Bitmap getCoverImage() {
+        return coverImage;
     }
 
     @Override
