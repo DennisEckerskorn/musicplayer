@@ -9,11 +9,21 @@ import android.os.IBinder;
 public class MusicService extends Service {
     private final IBinder binder = new MusicBinder();
     private MediaPlayer player;
+    private float playbackSpeed = 1.0f;
 
     public class MusicBinder extends Binder {
         public MusicService getService() {
             return MusicService.this;
         }
+    }
+
+    public void setOnCompletionListener(MediaPlayer.OnCompletionListener listener) {
+        player.setOnCompletionListener(listener);
+    }
+
+    public void setPlaybackSpeed(float speed) {
+        this.playbackSpeed = speed;
+        player.setPlaybackParams(player.getPlaybackParams().setSpeed(speed));
     }
 
     @Override
@@ -37,6 +47,7 @@ public class MusicService extends Service {
         }
         player.reset();
         player = MediaPlayer.create(this, resId);
+        player.setPlaybackParams(player.getPlaybackParams().setSpeed(playbackSpeed));
         player.start();
     }
 

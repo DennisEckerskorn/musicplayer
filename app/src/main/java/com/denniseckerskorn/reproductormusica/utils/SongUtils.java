@@ -45,7 +45,8 @@ public class SongUtils {
             return new Song(
                     title != null ? title : "Unknown Title",
                     artist != null ? artist : "Unknown Artist",
-                    album != null ? album : "Unknown Album", formattedDuration,
+                    album != null ? album : "Unknown Album",
+                    formattedDuration,
                     coverBitmap,
                     rawResId
             );

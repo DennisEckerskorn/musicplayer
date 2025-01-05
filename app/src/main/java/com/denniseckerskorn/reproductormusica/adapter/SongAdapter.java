@@ -16,7 +16,7 @@ import com.denniseckerskorn.reproductormusica.models.Song;
 import java.util.List;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
-    private List<Song> songs;
+    private final List<Song> songs;
     private OnSongClickListener onSongClickListener;
 
     public SongAdapter(List<Song> songs) {
@@ -46,11 +46,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     }
 
     public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView tvSongTitleItem;
-        private TextView tvSongArtistItem;
-        private TextView tvSongDurationItem;
-        private TextView tvSongAlbumItem;
-        private ImageView ivSongImageItem;
+        private final TextView tvSongTitleItem;
+        private final TextView tvSongArtistItem;
+        private final TextView tvSongDurationItem;
+        private final TextView tvSongAlbumItem;
+        private final ImageView ivSongImageItem;
 
         public SongViewHolder(@NonNull View itemView) {
             super(itemView);

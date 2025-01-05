@@ -24,7 +24,9 @@ import com.denniseckerskorn.reproductormusica.service.MusicService;
 import com.denniseckerskorn.reproductormusica.utils.SongUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements OnSongClickListen
     private boolean isBound = false;
     private ImageButton btnPlay;
     private ImageView ivSongCover;
+    private int currentSongIndex = 0;
+    private float playbackSpeed = 1.0f;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -79,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements OnSongClickListen
     public void onSongClick(Song song) {
         Log.d("MainActivity", "Song clicked: " + song.getTitle());
         playSong(song);
+        updatePlayButtonIcon();
     }
 
     private void setupToolbar() {
@@ -123,11 +128,30 @@ public class MainActivity extends AppCompatActivity implements OnSongClickListen
         });
 
         btnSpeedUp.setOnClickListener(v -> {
+            if (isBound && musicService != null) {
+                switch ((int) playbackSpeed * 10) {
+                    case 10:
+                        playbackSpeed = 2.0f;
+                        break;
+                    case 20:
+                        playbackSpeed = 3.0f;
+                        break;
+                    case 30:
+                        playbackSpeed = 1.0f;
+                        break;
+                    default:
+                        playbackSpeed = 1.0f;
+                        break;
+                }
+
+                musicService.setPlaybackSpeed(playbackSpeed);
+            }
 
         });
 
         btnPrevious.setOnClickListener(v -> {
-
+            playPreviousSong();
+            updatePlayButtonIcon();
         });
 
         //PLAY BUTTON LISTENER
@@ -149,11 +173,18 @@ public class MainActivity extends AppCompatActivity implements OnSongClickListen
         });
 
         btnNext.setOnClickListener(v -> {
+            playNextSong();
+            updatePlayButtonIcon();
 
         });
 
         btnShuffle.setOnClickListener(v -> {
-
+            if (isBound && musicService != null && !songs.isEmpty()) {
+                Collections.shuffle(songs);
+                currentSongIndex = 0;
+                playSong(songs.get(currentSongIndex));
+                updatePlayButtonIcon();
+            }
         });
 
 
@@ -184,17 +215,48 @@ public class MainActivity extends AppCompatActivity implements OnSongClickListen
             tvSongTitle.setText(song.getTitle());
             seekBar.setMax(musicService.getDuration());
             tvTotalMin.setText(formatDuration(musicService.getDuration()));
+
+            musicService.setPlaybackSpeed(playbackSpeed);
+
+            musicService.setOnCompletionListener(mp -> {
+                playNextSong();
+            });
+        }
+    }
+
+    private void playNextSong() {
+        if (!songs.isEmpty()) {
+            currentSongIndex = (currentSongIndex + 1) % songs.size();
+            Song nextSong = songs.get(currentSongIndex);
+            playSong(nextSong);
+        }
+    }
+
+    private void playPreviousSong() {
+        if (!songs.isEmpty()) {
+            currentSongIndex = (currentSongIndex - 1 + songs.size()) % songs.size();
+            Song previousSong = songs.get(currentSongIndex);
+            playSong(previousSong);
         }
     }
 
     private void loadSongs() {
         songs = new ArrayList<>();
         try {
-            songs.add(SongUtils.retrieveSongFromRaw(this, R.raw.dennis_lloyd_gfy));
-            songs.add(SongUtils.retrieveSongFromRaw(this, R.raw.dennis_lloyd_nevermind));
-            Log.d("MainActivity", "Songs loaded: " + songs.size());
-        } catch (IOException e) {
-            Log.e("MainActivity", "Error loading songs", e);
+            Field[] rawFiles = R.raw.class.getFields();
+
+            for (Field field : rawFiles) {
+                int resourceId = field.getInt(null);
+                try {
+                    Song song = SongUtils.retrieveSongFromRaw(this, resourceId);
+                    songs.add(song);
+                } catch (IOException e) {
+                    Log.e("MainActivity", "Error loading song: " + field.getName(), e);
+                }
+            }
+            Log.d("MainActivity", "Songs loaded automatically: " + songs.size());
+        } catch (IllegalAccessException e) {
+            Log.e("MainActivity", "Error accesing raw resources", e);
         }
     }
 
